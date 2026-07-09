@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"os"
 
 	baselog "github.com/coffeehc/base/log"
 	"github.com/coffeehc/boot/configuration"
@@ -14,12 +12,8 @@ import (
 
 // main 启动微信 Connector Server 进程。
 func main() {
-	if err := bootstrapStartupLogger(); err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "初始化日志配置失败: %v\n", err)
-		os.Exit(1)
-	}
 	configservice.InitConfig()
-	configuration.SetRunModel(RunMode)
+	configuration.SetRunModel(configuration.Model_product)
 	if configuration.Version == "" {
 		configuration.Version = "0.0.1"
 	}
