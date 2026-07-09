@@ -2,21 +2,64 @@
 
 [简体中文](README.zh-CN.md)
 
-This repository is the public release index for xAgent connectors.
+This repository is the public protocol, source, and release index for xAgent
+connectors.
 
-Connector binaries are published through GitHub Releases. Connector source code
-is currently maintained in the xAgent main repository unless a specific
-connector states otherwise.
+Connector binaries are published through GitHub Releases. Official connector
+source code lives under `connectors/<name>` when it is open-sourced here.
 
 Documentation:
 
 <https://xagent.xiagaogao.com>
 
+## What Is a Connector
+
+A Connector is a server-side bridge between xAgent and an external system such
+as WeChat, email, business software, or a custom service. It runs outside the
+xAgent process and owns the target system protocol, login state, message queue,
+media cache, and tool execution.
+
+xAgent talks to a Connector through a small common contract: it reads the
+Connector Card and Skill, opens a WebSocket data plane, invokes declared tools,
+and receives inbound messages as session events. The Connector keeps target
+system tokens and private protocol details inside its own service.
+
+```mermaid
+flowchart LR
+  Target["Target System"] <--> Connector["Connector Server"]
+  Connector <--> XAgent["xAgent Backend"]
+  XAgent --> Agent["Agent Session"]
+  XAgent --> User["Web / IM User"]
+```
+
+For connector developers, the important boundary is simple: expose stable
+capabilities to xAgent, keep external system secrets inside the Connector, and
+only publish tools that actually work for the current connection.
+
+## Developer Documents
+
+Connector developers do not need to understand xAgent internals first. Start
+from the common protocol, then use the architecture note only to clarify
+state ownership, lifecycle, and safety boundaries.
+
+- [Connector Common Protocol](docs/xagent_connector_protocol.md): wire contract
+  for Connector Card, HTTP endpoints, WebSocket packets, tools, auth, messages,
+  and media.
+- [Connector Architecture](docs/xagent_connection_architecture.md): role,
+  lifecycle, communication planes, state ownership, and safety boundaries.
+
+## Go Packages
+
+- [`connectors/protocol`](connectors/protocol): shared wire-contract models and
+  constants used by xAgent and connector implementations.
+- [`connectors/wechat`](connectors/wechat): official WeChat Connector source
+  and release metadata.
+
 ## Connectors
 
 | Connector | Directory | Release Tag Pattern | Description |
 | --- | --- | --- | --- |
-| WeChat Connector | [`connectors/wechat`](connectors/wechat) | `v0.0.1` | Connects xAgent with WeChat IM scenarios. |
+| WeChat Connector | [`connectors/wechat`](connectors/wechat) | `wechat-v*` | Connects xAgent with WeChat IM scenarios. |
 
 ## Download
 
@@ -27,11 +70,11 @@ Download connector binaries from:
 The current WeChat Connector release uses:
 
 ```text
-v0.0.1
+wechat-v0.0.1
 ```
 
-Future connector releases may use connector-specific tag names if multiple
-connectors need to be released independently.
+Connector releases use connector-scoped tag names so each connector can publish
+independently.
 
 ## Verify Artifacts
 
@@ -44,6 +87,7 @@ shasum -a 256 -c SHA256SUMS
 
 ## Repository Scope
 
-This repository stores connector release metadata, manifests, installation
-notes, and release assets. It should not be used as a source repository for
-xAgent connector implementation code unless that boundary changes explicitly.
+This repository stores connector protocol models, implementation source,
+release metadata, manifests, installation notes, protocol documents, and release
+assets. xAgent core runtime code stays in the xAgent main repository; external
+system integration code belongs in connector directories here.

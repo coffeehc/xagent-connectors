@@ -2,29 +2,55 @@
 
 [简体中文](README.zh-CN.md)
 
-WeChat Connector publishes the binary package used to connect xAgent with
-WeChat IM scenarios.
+WeChat Connector is the official reference implementation used to connect
+xAgent with WeChat IM scenarios. It owns the WeChat iLink protocol, QR login
+state, inbound message queue, media cache, and connector-side tool execution.
 
-## Release Tags
+## Source Layout
 
-Use connector-scoped release tags:
+```text
+connectors/wechat/
+  main.go
+  internal/services/
+  releases.json
+```
+
+The shared xAgent connector wire models are imported from
+[`../protocol`](../protocol).
+
+## Build And Test
+
+```bash
+go test ./connectors/wechat/...
+make -C connectors/wechat build
+```
+
+Run locally:
+
+```bash
+./connectors/wechat/dist/xagent-wechat-connector --addr 127.0.0.1:19090 --api-key test-api
+```
+
+## Release Tag
+
+The current WeChat Connector binary release uses:
 
 ```text
 wechat-v0.0.1
 ```
 
-Do not publish WeChat Connector assets to a generic `v0.0.1` release, because
-this repository may host multiple connector families.
+WeChat releases use connector-scoped tags so they can be published independently
+from xAgent and other connectors.
 
 ## Assets
 
 Typical release assets:
 
 ```text
-xagent-wechat-connector-v0.0.1-linux-amd64.tar.gz
-xagent-wechat-connector-v0.0.1-linux-arm64.tar.gz
-xagent-wechat-connector-v0.0.1-darwin-amd64.tar.gz
-xagent-wechat-connector-v0.0.1-darwin-arm64.tar.gz
+xagent-wechat-connector-wechat-v0.0.1-linux-amd64.tar.gz
+xagent-wechat-connector-wechat-v0.0.1-linux-arm64.tar.gz
+xagent-wechat-connector-wechat-v0.0.1-darwin-amd64.tar.gz
+xagent-wechat-connector-wechat-v0.0.1-darwin-arm64.tar.gz
 SHA256SUMS
 ```
 
