@@ -1,0 +1,26 @@
+{
+  "connector": "wechat",
+  "name": "xAgent WeChat Connector",
+  "release_tag_pattern": "wechat-v*",
+  "latest": null,
+  "releases_url": "https://github.com/coffeehc/xagent-connectors/releases",
+  "asset_name_pattern": "xagent-wechat-connector-{version}-{os}-{arch}.tar.gz",
+  "supported_targets": [
+    {
+      "os": "linux",
+      "arch": "amd64"
+    },
+    {
+      "os": "linux",
+      "arch": "arm64"
+    },
+    {
+      "os": "darwin",
+      "arch": "amd64"
+    },
+    {
+      "os": "darwin",
+      "arch": "arm64"
+    }
+  ]
+}
