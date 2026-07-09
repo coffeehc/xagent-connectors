@@ -35,8 +35,8 @@ flowchart LR
 
 ## Go 包
 
-- [`connectors/protocol`](connectors/protocol)：xAgent 和连接器实现共享的 wire contract 模型与常量。
-- [`connectors/wechat`](connectors/wechat)：官方 WeChat Connector 源码和发布元数据。
+- [`connectors/protocol`](connectors/protocol)：xAgent 和连接器实现共享的 wire contract 模型与常量。根 Go module 只拥有协议面，不携带 connector 实现依赖。
+- [`connectors/wechat`](connectors/wechat)：官方 WeChat Connector 源码和发布元数据。它是独立 Go module，拥有自己的运行时依赖。
 
 ## 连接器列表
 

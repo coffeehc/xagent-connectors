@@ -51,9 +51,12 @@ state ownership, lifecycle, and safety boundaries.
 ## Go Packages
 
 - [`connectors/protocol`](connectors/protocol): shared wire-contract models and
-  constants used by xAgent and connector implementations.
+  constants used by xAgent and connector implementations. The root Go module
+  only owns this protocol surface and intentionally has no connector
+  implementation dependencies.
 - [`connectors/wechat`](connectors/wechat): official WeChat Connector source
-  and release metadata.
+  and release metadata. It is a separate Go module with its own runtime
+  dependencies.
 
 ## Connectors
 

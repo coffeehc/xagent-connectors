@@ -18,9 +18,13 @@ connectors/wechat/
 The shared xAgent connector wire models are imported from
 [`../protocol`](../protocol).
 
+This directory is a separate Go module. The repository root `go.work` lets
+local development test both modules from the repository root.
+
 ## Build And Test
 
 ```bash
+go test ./connectors/protocol
 go test ./connectors/wechat/...
 make -C connectors/wechat build
 ```

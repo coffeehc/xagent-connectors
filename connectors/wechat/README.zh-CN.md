@@ -15,9 +15,12 @@ connectors/wechat/
 
 共享的 xAgent connector wire model 从 [`../protocol`](../protocol) 导入。
 
+本目录是独立 Go module。仓库根目录的 `go.work` 用于本地开发时从仓库根目录同时测试协议包和 WeChat module。
+
 ## 构建和测试
 
 ```bash
+go test ./connectors/protocol
 go test ./connectors/wechat/...
 make -C connectors/wechat build
 ```
