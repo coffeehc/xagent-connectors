@@ -14,7 +14,6 @@ import (
 	"github.com/coffeehc/xagent-connectors/connectors/wechat/internal/services/configservice"
 	"github.com/coffeehc/xagent-connectors/connectors/wechat/internal/services/connectservice"
 	"github.com/coffeehc/xagent-connectors/connectors/wechat/internal/services/mediaservice"
-	"github.com/coffeehc/xagent-connectors/connectors/wechat/internal/services/protocol"
 	"github.com/gofiber/fiber/v3"
 	"go.uber.org/zap"
 )
@@ -150,10 +149,15 @@ func (impl *serviceImpl) handleHealth() fiber.Handler {
 		if ok, err := impl.authorizedConnectorRequest(c); !ok || err != nil {
 			return err
 		}
+		card := impl.connect.BuildConnectorCard()
+		connectorCardVersion := ""
+		if card != nil {
+			connectorCardVersion = card.Connector.Version
+		}
 		return writeJSON(c, fiber.StatusOK, map[string]any{
 			"status":                 "ok",
 			"connector_card_id":      impl.connect.ConnectorID(),
-			"connector_card_version": protocol.DefaultVersion,
+			"connector_card_version": connectorCardVersion,
 		})
 	}
 }

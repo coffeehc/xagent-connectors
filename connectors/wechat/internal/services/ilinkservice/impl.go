@@ -33,7 +33,7 @@ const (
 	sendTypingEndpoint    = "ilink/bot/sendtyping"
 	notifyStartEndpoint   = "ilink/bot/msg/notifystart"
 	notifyStopEndpoint    = "ilink/bot/msg/notifystop"
-	defaultChannelVersion = protocol.DefaultVersion
+	defaultChannelVersion = protocol.ILinkChannelVersion
 	defaultBotAgent       = "xAgent/0.1"
 )
 

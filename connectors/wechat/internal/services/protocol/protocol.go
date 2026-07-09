@@ -9,8 +9,8 @@ const (
 	ConnectorCardID = "im.wechat"
 	// ConnectorName 是微信 Connector Card 的固定展示名。
 	ConnectorName = "WeChat Connector"
-	// DefaultVersion 是 Connector Card 中的默认 connector version。
-	DefaultVersion = "1.0.6"
+	// ILinkChannelVersion 是微信 iLink base_info 使用的内部通道版本，不是 Connector Card 或 GitHub Release 版本。
+	ILinkChannelVersion = "1.0.6"
 	// WeChatQRLoginFlowID 是微信二维码登录流程 id。
 	WeChatQRLoginFlowID = "wechat_qr_login"
 	// WeChatAPIBaseURL 是固定的微信 iLink API endpoint。

@@ -73,7 +73,7 @@ Download connector binaries from:
 The current WeChat Connector release uses:
 
 ```text
-wechat-v0.0.1
+wechat-v0.0.1.beta
 ```
 
 Connector releases use connector-scoped tag names so each connector can publish

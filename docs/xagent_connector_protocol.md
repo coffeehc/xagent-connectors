@@ -90,7 +90,7 @@ Base URL 规则：
   "connector_card_id": "im.wechat",
   "connector": {
     "name": "WeChat Connector",
-    "version": "1.0.6",
+    "version": "0.0.1.beta",
     "vendor": "Example",
     "description": "Bridge WeChat messages into xAgent."
   },
@@ -209,7 +209,7 @@ Skill 只表达 Agent 如何处理事件和使用工具，不得包含密钥、�
 {
   "status": "ok",
   "connector_card_id": "im.wechat",
-  "connector_card_version": "1.0.6"
+  "connector_card_version": "0.0.1.beta"
 }
 ```
 

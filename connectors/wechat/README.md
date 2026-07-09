@@ -26,7 +26,8 @@ local development test both modules from the repository root.
 ```bash
 go test ./connectors/protocol
 go test ./connectors/wechat/...
-make -C connectors/wechat build
+cd connectors/wechat
+go build -trimpath -o dist/xagent-wechat-connector .
 ```
 
 Run locally:
@@ -40,7 +41,7 @@ Run locally:
 The current WeChat Connector binary release uses:
 
 ```text
-wechat-v0.0.1
+wechat-v0.0.1.beta
 ```
 
 WeChat releases use connector-scoped tags so they can be published independently
@@ -51,10 +52,10 @@ from xAgent and other connectors.
 Typical release assets:
 
 ```text
-xagent-wechat-connector-wechat-v0.0.1-linux-amd64.tar.gz
-xagent-wechat-connector-wechat-v0.0.1-linux-arm64.tar.gz
-xagent-wechat-connector-wechat-v0.0.1-darwin-amd64.tar.gz
-xagent-wechat-connector-wechat-v0.0.1-darwin-arm64.tar.gz
+xagent-wechat-connector-wechat-v0.0.1.beta-linux-amd64.tar.gz
+xagent-wechat-connector-wechat-v0.0.1.beta-linux-arm64.tar.gz
+xagent-wechat-connector-wechat-v0.0.1.beta-darwin-amd64.tar.gz
+xagent-wechat-connector-wechat-v0.0.1.beta-darwin-arm64.tar.gz
 SHA256SUMS
 ```
 

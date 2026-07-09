@@ -13,7 +13,6 @@ import (
 	"github.com/coffeehc/base/log"
 	connectorprotocol "github.com/coffeehc/xagent-connectors/connectors/protocol"
 	"github.com/coffeehc/xagent-connectors/connectors/wechat/internal/services/connectservice"
-	connectordomain "github.com/coffeehc/xagent-connectors/connectors/wechat/internal/services/domain"
 	"github.com/fasthttp/websocket"
 	"github.com/gofiber/fiber/v3"
 	"github.com/valyala/fasthttp"
@@ -551,17 +550,6 @@ func (impl *serviceImpl) handleChannelClose(conn *channelConnection, packet *con
 		Time:               time.Now().UnixMilli(),
 		Payload:            map[string]any{"status": "ok"},
 	})
-}
-
-func (impl *serviceImpl) connectionByPacket(packet *connectorprotocol.WirePacket) *connectordomain.Connection {
-	if packet == nil {
-		return nil
-	}
-	connectorChannelID := strings.TrimSpace(packet.ConnectorChannelID)
-	if !impl.hasChannel(connectorChannelID) {
-		return nil
-	}
-	return impl.connect.ConnectionByChannel(connectorChannelID)
 }
 
 func (impl *serviceImpl) hasChannel(connectorChannelID string) bool {

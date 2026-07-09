@@ -53,7 +53,7 @@ flowchart LR
 当前微信连接器发布使用：
 
 ```text
-wechat-v0.0.1
+wechat-v0.0.1.beta
 ```
 
 连接器使用按连接器区分的 tag 命名，便于每个连接器独立发布。

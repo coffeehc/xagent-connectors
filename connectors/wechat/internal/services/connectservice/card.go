@@ -36,7 +36,6 @@ func (impl *serviceImpl) applyConnectorCardRuntimeFields(card *connectorprotocol
 	}
 	card.ConnectorCardID = protocol.ConnectorCardID
 	card.Connector.Name = protocol.ConnectorName
-	card.Connector.Version = protocol.DefaultVersion
 	if card.Security != nil {
 		card.Security.APIKeyRequired = impl.apiKey != ""
 	}
