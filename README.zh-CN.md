@@ -6,11 +6,15 @@
 
 连接器二进制文件通过 GitHub Releases 发布。除非某个连接器另有说明，连接器源码目前仍维护在 xAgent 主仓库中。
 
+使用文档：
+
+<https://xagent.xiagaogao.com>
+
 ## 连接器列表
 
 | 连接器 | 目录 | Release Tag 规则 | 说明 |
 | --- | --- | --- | --- |
-| WeChat Connector | [`connectors/wechat`](connectors/wechat) | `wechat-v*` | 用于将 xAgent 接入微信 IM 场景。 |
+| WeChat Connector | [`connectors/wechat`](connectors/wechat) | `v0.0.1` | 用于将 xAgent 接入微信 IM 场景。 |
 
 ## 下载
 
@@ -18,15 +22,13 @@
 
 <https://github.com/coffeehc/xagent-connectors/releases>
 
-每个连接器使用独立的 Release tag 命名空间，例如：
+当前微信连接器发布使用：
 
 ```text
-wechat-v0.0.1
-feishu-v0.0.1
-email-v0.0.1
+v0.0.1
 ```
 
-这样即使多个连接器使用同一个产品版本号，也不会把不同连接器的附件混在同一个 Release 里。
+后续如果多个连接器需要独立发布，可以再使用按连接器区分的 tag 命名。
 
 ## 校验
 

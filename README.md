@@ -8,11 +8,15 @@ Connector binaries are published through GitHub Releases. Connector source code
 is currently maintained in the xAgent main repository unless a specific
 connector states otherwise.
 
+Documentation:
+
+<https://xagent.xiagaogao.com>
+
 ## Connectors
 
 | Connector | Directory | Release Tag Pattern | Description |
 | --- | --- | --- | --- |
-| WeChat Connector | [`connectors/wechat`](connectors/wechat) | `wechat-v*` | Connects xAgent with WeChat IM scenarios. |
+| WeChat Connector | [`connectors/wechat`](connectors/wechat) | `v0.0.1` | Connects xAgent with WeChat IM scenarios. |
 
 ## Download
 
@@ -20,16 +24,14 @@ Download connector binaries from:
 
 <https://github.com/coffeehc/xagent-connectors/releases>
 
-Each connector uses its own release tag namespace. For example:
+The current WeChat Connector release uses:
 
 ```text
-wechat-v0.0.1
-feishu-v0.0.1
-email-v0.0.1
+v0.0.1
 ```
 
-This keeps assets for different connectors separated even when they share the
-same product version number.
+Future connector releases may use connector-specific tag names if multiple
+connectors need to be released independently.
 
 ## Verify Artifacts
 
