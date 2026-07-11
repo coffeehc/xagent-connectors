@@ -1,0 +1,137 @@
+{
+  "schema": "xagent.connector/v1",
+  "connector_card_id": "im.telegram",
+  "connector": {
+    "name": "Telegram Connector",
+    "version": "0.0.2",
+    "vendor": "xagent",
+    "description": "Local Telegram connector backed by Telegram Bot API. Users bind their own bot_token and target chat_id; the connector keeps tokens inside local storage."
+  },
+  "supports": {
+    "target_types": ["im"],
+    "targets": [
+      {
+        "target_type": "im",
+        "provider": "telegram",
+        "label": "Telegram",
+        "description": "Telegram bot private or group chat messages."
+      }
+    ],
+    "profiles": ["xagent.im.v1"]
+  },
+  "tools": [
+    {
+      "tool_id": "telegram_message_send",
+      "profile": "xagent.im.v1",
+      "title": "发送 Telegram IM 消息",
+      "description": "向当前认证 connection 绑定的 Telegram chat 发送纯文本消息；chat_id 由 connector channel 绑定关系决定。如需发送图片、视频或文件等附件，请先加载 im-connector-reply skill 获取附件发送流程，再使用 telegram_message_send_media。",
+      "related_skill_ids": ["im-connector-reply"],
+      "input_schema": {
+        "type": "object",
+        "description": "本工具只发送纯文本。需要发送附件时，不要调用本工具；请先加载 im-connector-reply skill，再按 skill 中的附件流程调用 telegram_message_send_media。",
+        "required": ["text"],
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "要发送给 Telegram chat 的纯文本内容；不能包含本地路径、base64、文件字节或附件引用。附件发送请先加载 im-connector-reply skill。"
+          }
+        }
+      }
+    },
+    {
+      "tool_id": "telegram_message_send_media",
+      "profile": "xagent.im.v1",
+      "title": "发送 Telegram IM 媒体",
+      "description": "向当前认证 connection 绑定的 Telegram chat 发送已上传的图片、视频或文件。发送 xAgent 生成或持有的本地文件前，先调用 Connector HTTP 上传端点 POST /media/uploads，使用 multipart 字段 file，并带上 X-XAgent-Connector-Channel-ID 当前 channel header，取得 media_ref 后再调用本工具。不要把本地路径、base64、文件字节、Telegram file_id、bot token 或 chat_id 放进工具参数。",
+      "related_skill_ids": ["im-connector-reply"],
+      "input_schema": {
+        "type": "object",
+        "required": ["media_ref"],
+        "additionalProperties": false,
+        "properties": {
+          "media_ref": {
+            "type": "string",
+            "description": "Connector POST /media/uploads 返回的媒体引用，或 Telegram 入站 payload.media[].media_ref；引用已绑定当前 connector channel，内部携带媒体类型、文件名和 Telegram 发送所需信息。"
+          },
+          "text": {
+            "type": "string",
+            "description": "可选媒体说明，会作为 Telegram caption 发送；纯文本回复不要调用本工具。"
+          },
+          "caption": {
+            "type": "string",
+            "description": "text 的兼容别名；优先使用 text。"
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "发送结果，成功时为 sent。"
+          },
+          "message_id": {
+            "type": "integer",
+            "description": "Telegram 返回的 message_id。"
+          },
+          "media_ref": {
+            "type": "string",
+            "description": "本次发送使用的 media_ref。"
+          },
+          "media_type": {
+            "type": "string",
+            "enum": ["image", "video", "file"],
+            "description": "connector 归一化后的媒体类型。"
+          }
+        }
+      }
+    }
+  ],
+  "auth_flows": [
+    {
+      "id": "telegram_bot_binding",
+      "target_type": "im",
+      "type": "form",
+      "title": "Telegram Bot 绑定",
+      "description": "提交自己的 Telegram bot_token 和目标 chat_id。connector 以 bot 为单位长轮询 update，再按 chat_id 过滤到当前 channel。",
+      "fields": [
+        {
+          "name": "bot_token",
+          "label": "Bot Token",
+          "input_type": "password",
+          "required": true,
+          "placeholder": "123456:ABC-DEF...",
+          "help_text": "由 BotFather 创建 bot 后获得。请先和该 bot 建立会话。",
+          "secret": true
+        },
+        {
+          "name": "chat_id",
+          "label": "Chat ID",
+          "input_type": "text",
+          "required": true,
+          "placeholder": "例如 123456789",
+          "help_text": "目标 Telegram 私聊、群或频道的 chat_id。"
+        }
+      ]
+    }
+  ],
+  "ui": {
+    "login_flow": {
+      "flow_id": "telegram_bot_binding",
+      "steps": [
+        {
+          "type": "form",
+          "request_type": "auth.start",
+          "response_type": "auth.start.ack"
+        }
+      ]
+    }
+  },
+  "security": {
+    "trust_level": "local",
+    "api_key_required": true,
+    "requires_signature": false,
+    "data_classes": ["im.messages"]
+  }
+}

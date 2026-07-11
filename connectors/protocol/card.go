@@ -127,6 +127,11 @@ type ConnectorToolDescriptor struct {
 	Title string `json:"title,omitempty"`
 	// Description 表示工具说明，可为空。
 	Description string `json:"description,omitempty"`
+	// RelatedSkillIDs 表示使用或选择该工具时建议加载的 Connector Skill ID 集合。
+	//
+	// 语义边界：该字段表达工具与工作流说明的关联，不代表调用工具前必须完成额外认证；
+	// xAgent 可在用户意图涉及复杂流程、附件、格式转换或多工具编排时加载这些 Skill。
+	RelatedSkillIDs []string `json:"related_skill_ids,omitempty"`
 	// InputSchema 表示工具输入 JSON Schema，可为空。
 	InputSchema map[string]any `json:"input_schema,omitempty"`
 	// OutputSchema 表示工具输出 JSON Schema，可为空。
@@ -139,12 +144,14 @@ type ConnectorAuthFlowDescriptor struct {
 	ID string `json:"id"`
 	// TargetType 表示该 auth flow 绑定的 target type，可为空。
 	TargetType ConnectorTargetType `json:"target_type,omitempty"`
-	// Type 表示认证流程类型，例如 qr_login、oauth2 或 private_key。
-	Type string `json:"type"`
+	// Type 表示认证流程类型，例如 qr_login 或 form。
+	Type ConnectorAuthFlowType `json:"type"`
 	// Title 表示认证流程展示标题，可为空。
 	Title string `json:"title,omitempty"`
 	// Description 表示认证流程说明，可为空。
 	Description string `json:"description,omitempty"`
+	// Fields 表示动态表单认证字段，仅 type=form 时使用。
+	Fields []ConnectorAuthFlowField `json:"fields,omitempty"`
 	// ConfigSchema 表示配置 JSON Schema，可为空。
 	ConfigSchema map[string]any `json:"config_schema,omitempty"`
 	// UISchema 表示前端渲染提示，可为空。

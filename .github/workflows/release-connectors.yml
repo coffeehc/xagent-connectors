@@ -1,0 +1,195 @@
+name: Release Connectors
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag, for example v0.0.2"
+        required: true
+        default: "v0.0.2"
+      replace_existing:
+        description: "Delete an existing release and tag before publishing"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish connector binaries
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.work
+          cache-dependency-path: |
+            go.work.sum
+            connectors/wechat/go.sum
+            connectors/telegram/go.sum
+
+      - name: Resolve release tag
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            tag="${{ inputs.tag }}"
+          else
+            tag="${GITHUB_REF_NAME}"
+          fi
+
+          if [[ ! "$tag" =~ ^v.+$ ]]; then
+            echo "release tag must match v*: $tag" >&2
+            exit 1
+          fi
+
+          version="${tag#v}"
+          if [[ -z "$version" ]]; then
+            echo "release version is empty" >&2
+            exit 1
+          fi
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Validate release metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tag="${{ steps.release.outputs.tag }}"
+          version="${{ steps.release.outputs.version }}"
+
+          for connector_dir in connectors/wechat connectors/telegram; do
+            jq empty "$connector_dir/releases.json"
+            jq empty "$connector_dir/internal/services/connectservice/assets/connector_card.json"
+
+            latest="$(jq -r '.latest' "$connector_dir/releases.json")"
+            if [[ "$latest" != "$tag" ]]; then
+              echo "$connector_dir/releases.json latest must be $tag, got $latest" >&2
+              exit 1
+            fi
+
+            card_version="$(jq -r '.connector.version' "$connector_dir/internal/services/connectservice/assets/connector_card.json")"
+            if [[ "$card_version" != "$version" ]]; then
+              echo "$connector_dir connector card version must be $version, got $card_version" >&2
+              exit 1
+            fi
+          done
+
+      - name: Test
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./connectors/protocol ./connectors/wechat/... ./connectors/telegram/...
+          go vet ./connectors/protocol ./connectors/wechat/... ./connectors/telegram/...
+
+      - name: Prepare replacement release
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tag="${{ steps.release.outputs.tag }}"
+          if [[ "${{ inputs.replace_existing }}" == "true" ]]; then
+            gh release delete "$tag" --yes --cleanup-tag 2>/dev/null || true
+            git push origin ":refs/tags/$tag" 2>/dev/null || true
+            exit 0
+          fi
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "release already exists: $tag" >&2
+            exit 1
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
+            echo "tag already exists: $tag" >&2
+            exit 1
+          fi
+
+      - name: Build release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tag="${{ steps.release.outputs.tag }}"
+          release_dir="$GITHUB_WORKSPACE/dist/release"
+          mkdir -p "$release_dir"
+
+          build_connector() {
+            local connector_dir="$1"
+            local binary_name="$2"
+
+            while IFS=/ read -r target_os target_arch; do
+              work_dir="$(mktemp -d)"
+              asset_name="$binary_name-$tag-$target_os-$target_arch.tar.gz"
+
+              (
+                cd "$connector_dir"
+                CGO_ENABLED=0 GOOS="$target_os" GOARCH="$target_arch" \
+                  go build -trimpath -o "$work_dir/$binary_name" .
+              )
+
+              tar -C "$work_dir" -czf "$release_dir/$asset_name" "$binary_name"
+              rm -rf "$work_dir"
+            done < <(jq -r '.supported_targets[] | "\(.os)/\(.arch)"' "$connector_dir/releases.json")
+          }
+
+          build_connector connectors/wechat xagent-wechat-connector
+          build_connector connectors/telegram xagent-telegram-connector
+
+          (
+            cd "$release_dir"
+            shasum -a 256 *.tar.gz > SHA256SUMS
+          )
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tag="${{ steps.release.outputs.tag }}"
+          release_dir="$GITHUB_WORKSPACE/dist/release"
+          notes_file="$RUNNER_TEMP/connectors-release-notes.md"
+
+          cat > "$notes_file" <<EOF
+          xAgent Connectors $tag
+
+          Included connectors:
+          - WeChat Connector
+          - Telegram Connector
+
+          Assets follow connectors/wechat/releases.json and connectors/telegram/releases.json.
+          EOF
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            gh release create "$tag" \
+              "$release_dir"/*.tar.gz \
+              "$release_dir/SHA256SUMS" \
+              --target "$GITHUB_SHA" \
+              --title "xAgent Connectors $tag" \
+              --notes-file "$notes_file"
+          else
+            gh release create "$tag" \
+              "$release_dir"/*.tar.gz \
+              "$release_dir/SHA256SUMS" \
+              --title "xAgent Connectors $tag" \
+              --notes-file "$notes_file"
+          fi

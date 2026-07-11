@@ -104,7 +104,7 @@ func (service *testConnectService) BuildConnectorCard() *connectorprotocol.Conne
 	return &connectorprotocol.ConnectorCard{
 		Schema: "xagent.connector/v1",
 		Connector: connectorprotocol.ConnectorCardInfo{
-			Version: "0.0.1.beta",
+			Version: "0.0.1",
 		},
 	}
 }
@@ -251,7 +251,7 @@ func TestHealthRequiresAPIKey(t *testing.T) {
 	if err = json.NewDecoder(response.Body).Decode(&payload); err != nil {
 		t.Fatalf("health response JSON decode failed: %v", err)
 	}
-	if payload["connector_card_id"] != protocol.ConnectorCardID || payload["connector_card_version"] != "0.0.1.beta" {
+	if payload["connector_card_id"] != protocol.ConnectorCardID || payload["connector_card_version"] != "0.0.1" {
 		t.Fatalf("health 应返回 Connector Card 标识和版本，got=%+v", payload)
 	}
 }

@@ -40,12 +40,14 @@ flowchart LR
 
 - [`connectors/protocol`](connectors/protocol)：xAgent 和连接器实现共享的 wire contract 模型与常量。根 Go module 只拥有协议面，不携带 connector 实现依赖。
 - [`connectors/wechat`](connectors/wechat)：官方 WeChat Connector 源码和发布元数据。它是独立 Go module，拥有自己的运行时依赖。
+- [`connectors/telegram`](connectors/telegram)：Telegram Connector 源码。它是独立 Go module，使用用户提交的 Telegram bot token 和 chat_id 完成 IM channel 绑定。
 
 ## 连接器列表
 
 | 连接器 | 目录 | Release Tag 规则 | 说明 |
 | --- | --- | --- | --- |
-| WeChat Connector | [`connectors/wechat`](connectors/wechat) | `wechat-v*` | 用于将 xAgent 接入微信 IM 场景。 |
+| Telegram Connector | [`connectors/telegram`](connectors/telegram) | `v*` | 用于将 xAgent 接入 Telegram Bot API IM 场景。 |
+| WeChat Connector | [`connectors/wechat`](connectors/wechat) | `v*` | 用于将 xAgent 接入微信 IM 场景。 |
 
 ## 下载
 
@@ -53,13 +55,15 @@ flowchart LR
 
 <https://github.com/coffeehc/xagent-connectors/releases>
 
-当前微信连接器发布使用：
+当前连接器发布同时包含 Telegram 和微信：
 
 ```text
-wechat-v0.0.1.beta
+v0.0.2
 ```
 
-连接器使用按连接器区分的 tag 命名，便于每个连接器独立发布。
+Release 附件通过连接器二进制名前缀区分，例如
+`xagent-telegram-connector-v0.0.2-linux-amd64.tar.gz` 和
+`xagent-wechat-connector-v0.0.2-linux-amd64.tar.gz`。
 
 ## 校验
 

@@ -60,12 +60,16 @@ state ownership, lifecycle, and safety boundaries.
 - [`connectors/wechat`](connectors/wechat): official WeChat Connector source
   and release metadata. It is a separate Go module with its own runtime
   dependencies.
+- [`connectors/telegram`](connectors/telegram): Telegram Connector source. It
+  is a separate Go module and uses user-provided Telegram bot tokens plus chat
+  IDs for IM channel binding.
 
 ## Connectors
 
 | Connector | Directory | Release Tag Pattern | Description |
 | --- | --- | --- | --- |
-| WeChat Connector | [`connectors/wechat`](connectors/wechat) | `wechat-v*` | Connects xAgent with WeChat IM scenarios. |
+| Telegram Connector | [`connectors/telegram`](connectors/telegram) | `v*` | Connects xAgent with Telegram Bot API IM scenarios. |
+| WeChat Connector | [`connectors/wechat`](connectors/wechat) | `v*` | Connects xAgent with WeChat IM scenarios. |
 
 ## Download
 
@@ -73,14 +77,15 @@ Download connector binaries from:
 
 <https://github.com/coffeehc/xagent-connectors/releases>
 
-The current WeChat Connector release uses:
+The current connector release includes both Telegram and WeChat:
 
 ```text
-wechat-v0.0.1.beta
+v0.0.2
 ```
 
-Connector releases use connector-scoped tag names so each connector can publish
-independently.
+Release assets use connector-specific binary prefixes, for example
+`xagent-telegram-connector-v0.0.2-linux-amd64.tar.gz` and
+`xagent-wechat-connector-v0.0.2-linux-amd64.tar.gz`.
 
 ## Verify Artifacts
 

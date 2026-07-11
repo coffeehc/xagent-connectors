@@ -510,6 +510,29 @@ func TestBuildConnectorCardDeclaresStaticCapabilities(t *testing.T) {
 	if card.Tools[0].ToolID != "wechat_message_send" || card.Tools[1].ToolID != "wechat_message_send_media" {
 		t.Fatalf("Connector Card 工具声明异常: %+v", card.Tools)
 	}
+	if err := connectorprotocol.ValidateConnectorCardToolInputSchemas(card); err != nil {
+		t.Fatalf("Connector Card 工具 schema 协议校验失败: %v", err)
+	}
+	if len(card.Tools[0].RelatedSkillIDs) != 1 || card.Tools[0].RelatedSkillIDs[0] != protocol.ConnectorSkillIMReplyID {
+		t.Fatalf("文本工具 related_skill_ids 异常: %+v", card.Tools[0].RelatedSkillIDs)
+	}
+	if len(card.Tools[1].RelatedSkillIDs) != 1 || card.Tools[1].RelatedSkillIDs[0] != protocol.ConnectorSkillIMReplyID {
+		t.Fatalf("媒体工具 related_skill_ids 异常: %+v", card.Tools[1].RelatedSkillIDs)
+	}
+	textSchemaDescription, _ := card.Tools[0].InputSchema["description"].(string)
+	if !strings.Contains(textSchemaDescription, protocol.ConnectorSkillIMReplyID) || !strings.Contains(textSchemaDescription, "wechat_message_send_media") {
+		t.Fatalf("文本工具 schema 应指向 skill 和媒体工具: %s", textSchemaDescription)
+	}
+	assertConnectorChannelIDInputSchema(t, card.Tools[0])
+	textRequired := schemaRequiredStrings(t, card.Tools[0].InputSchema)
+	if !containsTestString(textRequired, "text") || !containsTestString(textRequired, connectorprotocol.ConnectorToolParamConnectorChannelID) {
+		t.Fatalf("文本工具 required schema 异常: %+v", textRequired)
+	}
+	assertConnectorChannelIDInputSchema(t, card.Tools[1])
+	mediaRequired := schemaRequiredStrings(t, card.Tools[1].InputSchema)
+	if !containsTestString(mediaRequired, "media_ref") || !containsTestString(mediaRequired, connectorprotocol.ConnectorToolParamConnectorChannelID) {
+		t.Fatalf("媒体工具 required schema 异常: %+v", mediaRequired)
+	}
 	skillContent, err := service.ReadConnectorSkill(context.Background())
 	if err != nil {
 		t.Fatalf("ReadConnectorSkill failed: %v", err)
@@ -517,6 +540,58 @@ func TestBuildConnectorCardDeclaresStaticCapabilities(t *testing.T) {
 	if skillContent == nil || skillContent.SHA256 == "" || skillContent.SkillID != protocol.ConnectorSkillIMReplyID {
 		t.Fatalf("主 Skill 内容异常: %+v", skillContent)
 	}
+	if !strings.Contains(skillContent.Content, "This skill owns the WeChat attachment sending workflow") || !strings.Contains(skillContent.Content, "wechat_message_send is the wrong tool") {
+		t.Fatalf("主 Skill 应声明附件流程 owner 和工具选择规则")
+	}
+}
+
+func assertConnectorChannelIDInputSchema(t *testing.T, tool connectorprotocol.ConnectorToolDescriptor) {
+	t.Helper()
+	properties, ok := tool.InputSchema["properties"].(map[string]any)
+	if !ok {
+		t.Fatalf("工具 %s properties schema 异常: %+v", tool.ToolID, tool.InputSchema["properties"])
+	}
+	channelProperty, ok := properties[connectorprotocol.ConnectorToolParamConnectorChannelID].(map[string]any)
+	if !ok {
+		t.Fatalf("工具 %s 缺少 connector_channel_id property: %+v", tool.ToolID, properties)
+	}
+	if channelProperty["type"] != "string" {
+		t.Fatalf("工具 %s connector_channel_id 必须是 string: %+v", tool.ToolID, channelProperty)
+	}
+	required := schemaRequiredStrings(t, tool.InputSchema)
+	if !containsTestString(required, connectorprotocol.ConnectorToolParamConnectorChannelID) {
+		t.Fatalf("工具 %s connector_channel_id 必须在 required 中: %+v", tool.ToolID, required)
+	}
+}
+
+func schemaRequiredStrings(t *testing.T, schema map[string]any) []string {
+	t.Helper()
+	switch values := schema["required"].(type) {
+	case []string:
+		return append([]string{}, values...)
+	case []any:
+		output := []string{}
+		for _, value := range values {
+			item, ok := value.(string)
+			if !ok {
+				t.Fatalf("required item 应为 string: %+v", values)
+			}
+			output = append(output, item)
+		}
+		return output
+	default:
+		t.Fatalf("required schema 异常: %+v", schema["required"])
+		return nil
+	}
+}
+
+func containsTestString(values []string, target string) bool {
+	for _, value := range values {
+		if value == target {
+			return true
+		}
+	}
+	return false
 }
 
 func TestBuildConnectionDescriptor(t *testing.T) {
@@ -1237,6 +1312,8 @@ func TestBuildInboundMessagePayloadUsesMessagePushFields(t *testing.T) {
 		"用户文本：你好",
 		"wechat_message_send 工具",
 		"参数 text 是回复内容",
+		"im-connector-reply skill",
+		"wechat_message_send_media 工具",
 	} {
 		if !strings.Contains(text, expected) {
 			t.Fatalf("message.push text 缺少 %q: %s", expected, text)
@@ -1248,6 +1325,14 @@ func TestBuildInboundMessagePayloadUsesMessagePushFields(t *testing.T) {
 	reply, ok := payload["reply"].(map[string]any)
 	if !ok || reply["tool_id"] != "wechat_message_send" {
 		t.Fatalf("reply 契约异常: %+v", payload["reply"])
+	}
+	skill, ok := payload["skill"].(map[string]any)
+	if !ok {
+		t.Fatalf("skill 契约异常: %+v", payload["skill"])
+	}
+	requiredToolIDs, ok := skill["required_tool_ids"].([]string)
+	if !ok || len(requiredToolIDs) != 2 || requiredToolIDs[0] != "wechat_message_send" || requiredToolIDs[1] != "wechat_message_send_media" {
+		t.Fatalf("skill required_tool_ids 异常: %+v", skill["required_tool_ids"])
 	}
 	if payload["raw_message"] == nil {
 		t.Fatalf("payload 应保留 raw_message")

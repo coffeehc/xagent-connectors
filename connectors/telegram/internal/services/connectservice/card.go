@@ -1,16 +1,22 @@
 package connectservice
 
 import (
+	"context"
+	"crypto/sha256"
 	_ "embed"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 
 	connectorprotocol "github.com/coffeehc/xagent-connectors/connectors/protocol"
-	"github.com/coffeehc/xagent-connectors/connectors/wechat/internal/services/protocol"
+	"github.com/coffeehc/xagent-connectors/connectors/telegram/internal/services/protocol"
 )
 
 //go:embed assets/connector_card.json
 var connectorCardJSON []byte
+
+//go:embed assets/skills/im-connector-reply/SKILL.md
+var connectorSkillMarkdown string
 
 // BuildConnectorCard 构建未绑定前公开读取的 Connector Card。
 func (impl *serviceImpl) BuildConnectorCard() *connectorprotocol.ConnectorCard {
@@ -57,4 +63,15 @@ func applyConnectorToolInputSchemas(card *connectorprotocol.ConnectorCard) error
 		card.Tools[index].InputSchema = inputSchema
 	}
 	return connectorprotocol.ValidateConnectorCardToolInputSchemas(card)
+}
+
+// ReadConnectorSkill 读取 connector v1 标准主 Skill 内容。
+func (impl *serviceImpl) ReadConnectorSkill(context.Context) (*ConnectorSkillContent, error) {
+	sum := sha256.Sum256([]byte(connectorSkillMarkdown))
+	return &ConnectorSkillContent{
+		SkillID:     protocol.ConnectorSkillIMReplyID,
+		ContentType: "text/markdown; charset=utf-8",
+		Content:     connectorSkillMarkdown,
+		SHA256:      hex.EncodeToString(sum[:]),
+	}, nil
 }

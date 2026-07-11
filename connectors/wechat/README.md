@@ -38,24 +38,24 @@ Run locally:
 
 ## Release Tag
 
-The current WeChat Connector binary release uses:
+The current connector release uses the repository-level tag:
 
 ```text
-wechat-v0.0.1.beta
+v0.0.2
 ```
 
-WeChat releases use connector-scoped tags so they can be published independently
-from xAgent and other connectors.
+The same release includes Telegram and WeChat assets. WeChat assets use the
+`xagent-wechat-connector` prefix.
 
 ## Assets
 
 Typical release assets:
 
 ```text
-xagent-wechat-connector-wechat-v0.0.1.beta-linux-amd64.tar.gz
-xagent-wechat-connector-wechat-v0.0.1.beta-linux-arm64.tar.gz
-xagent-wechat-connector-wechat-v0.0.1.beta-darwin-amd64.tar.gz
-xagent-wechat-connector-wechat-v0.0.1.beta-darwin-arm64.tar.gz
+xagent-wechat-connector-v0.0.2-linux-amd64.tar.gz
+xagent-wechat-connector-v0.0.2-linux-arm64.tar.gz
+xagent-wechat-connector-v0.0.2-darwin-amd64.tar.gz
+xagent-wechat-connector-v0.0.2-darwin-arm64.tar.gz
 SHA256SUMS
 ```
 

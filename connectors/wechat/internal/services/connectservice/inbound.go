@@ -520,7 +520,7 @@ func buildInboundMessagePayload(connection *connectordomain.Connection, message 
 		},
 		"skill": map[string]any{
 			"skill_id":          protocol.ConnectorSkillIMReplyID,
-			"required_tool_ids": []string{toolIDWeChatMessageSend},
+			"required_tool_ids": []string{toolIDWeChatMessageSend, toolIDWeChatMessageSendMedia},
 		},
 		"activation_message": text,
 	}
@@ -554,9 +554,13 @@ func buildWeChatInboundVisibleText(message *ilinkservice.WeixinMessage, rawText 
 	builder.WriteString("用户文本：")
 	builder.WriteString(userText)
 	builder.WriteString("\n\n")
-	builder.WriteString("先处理微信消息，然后使用 ")
+	builder.WriteString("先处理微信消息。文本回复使用 ")
 	builder.WriteString(toolIDWeChatMessageSend)
-	builder.WriteString(" 工具将处理结果回复给我，参数 text 是回复内容。")
+	builder.WriteString(" 工具，参数 text 是回复内容；如果需要回复图片、视频或文件，先加载 ")
+	builder.WriteString(protocol.ConnectorSkillIMReplyID)
+	builder.WriteString(" skill，并使用 ")
+	builder.WriteString(toolIDWeChatMessageSendMedia)
+	builder.WriteString(" 工具发送。")
 	return builder.String()
 }
 

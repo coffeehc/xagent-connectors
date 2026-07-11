@@ -1,0 +1,12 @@
+run_model: dev
+logger:
+  level: debug
+  file_config:
+    file_name: ./logs/service.log
+    enable: false
+    maxsize: 100
+    max_backups: 5
+    max_age: 7
+    compress: false
+  enable_console: true
+  enable_color: true

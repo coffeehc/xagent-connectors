@@ -1,5 +1,53 @@
 package protocol
 
+// ConnectorAuthFlowType 表示 connector 支持的认证交互类型。
+type ConnectorAuthFlowType string
+
+const (
+	// ConnectorAuthFlowTypeQRLogin 表示二维码登录型认证。
+	ConnectorAuthFlowTypeQRLogin ConnectorAuthFlowType = "qr_login"
+	// ConnectorAuthFlowTypeForm 表示动态表单提交型认证。
+	ConnectorAuthFlowTypeForm ConnectorAuthFlowType = "form"
+)
+
+// ConnectorAuthInputType 表示认证表单字段的输入控件类型。
+type ConnectorAuthInputType string
+
+const (
+	// ConnectorAuthInputTypeText 表示普通文本输入框。
+	ConnectorAuthInputTypeText ConnectorAuthInputType = "text"
+	// ConnectorAuthInputTypePassword 表示敏感输入框。
+	ConnectorAuthInputTypePassword ConnectorAuthInputType = "password"
+)
+
+// ConnectorAuthFlowField 表示 Connector Card 中一个动态认证表单字段。
+type ConnectorAuthFlowField struct {
+	// Name 表示提交字段名，必须在同一 auth flow 内唯一。
+	Name string `json:"name"`
+	// Label 表示前端展示名称。
+	Label string `json:"label"`
+	// InputType 表示输入控件类型，例如 text、password。
+	InputType ConnectorAuthInputType `json:"input_type"`
+	// Required 表示该字段是否必填。
+	Required bool `json:"required,omitempty"`
+	// Placeholder 表示输入框占位提示，可为空。
+	Placeholder string `json:"placeholder,omitempty"`
+	// HelpText 表示字段帮助说明，可为空。
+	HelpText string `json:"help_text,omitempty"`
+	// Secret 表示字段是否属于敏感输入，前端应避免明文展示。
+	Secret bool `json:"secret,omitempty"`
+	// DefaultValue 表示字段默认值，可为空；敏感字段禁止设置默认值。
+	DefaultValue string `json:"default_value,omitempty"`
+}
+
+// ConnectorAuthStartRequest 表示 xAgent 发给 connector 的认证启动请求。
+type ConnectorAuthStartRequest struct {
+	// FlowID 表示本次认证使用的 Connector Card auth flow id。
+	FlowID string `json:"flow_id"`
+	// Input 表示动态表单认证提交的字段值；非表单认证可为空。
+	Input map[string]string `json:"input,omitempty"`
+}
+
 // ConnectorAuthStartStatus 表示 connector 用户连接初始化后的当前状态。
 type ConnectorAuthStartStatus string
 

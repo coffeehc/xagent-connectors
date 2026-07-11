@@ -3,7 +3,7 @@
   "connector_card_id": "im.wechat",
   "connector": {
     "name": "WeChat Connector",
-    "version": "0.0.1.beta",
+    "version": "0.0.2",
     "vendor": "xagent",
     "description": "Local WeChat connector backed by WeChat iLink QR login. The QR payload comes from WeChat, and the bot token stays inside this connector."
   },
@@ -24,14 +24,17 @@
       "tool_id": "wechat_message_send",
       "profile": "xagent.im.v1",
       "title": "发送微信 IM 消息",
-      "description": "向当前认证 connection 的微信用户发送文本消息；接收人由 connector 登录态决定。",
+      "description": "向当前认证 connection 的微信用户发送纯文本消息；接收人由 connector 登录态决定。如需发送图片、视频或文件等附件，请先加载 im-connector-reply skill 获取附件发送流程，再使用 wechat_message_send_media。",
+      "related_skill_ids": ["im-connector-reply"],
       "input_schema": {
         "type": "object",
+        "description": "本工具只发送纯文本。需要发送附件时，不要调用本工具；请先加载 im-connector-reply skill，再按 skill 中的附件流程调用 wechat_message_send_media。",
         "required": ["text"],
+        "additionalProperties": false,
         "properties": {
           "text": {
             "type": "string",
-            "description": "要发送给微信用户的文本内容。"
+            "description": "要发送给微信用户的纯文本内容；不能包含本地路径、base64、文件字节或附件引用。附件发送请先加载 im-connector-reply skill。"
           }
         }
       }
@@ -41,9 +44,11 @@
       "profile": "xagent.im.v1",
       "title": "发送微信 IM 媒体",
       "description": "向当前认证 connection 的微信用户发送已上传的图片、视频或文件；先调用 connector 的 POST /media/uploads 上传文件并取得 media_ref，再调用本工具发送。",
+      "related_skill_ids": ["im-connector-reply"],
       "input_schema": {
         "type": "object",
         "required": ["media_ref"],
+        "additionalProperties": false,
         "properties": {
           "media_ref": {
             "type": "string",

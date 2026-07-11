@@ -1,3 +1,4 @@
 .DS_Store
 .idea/
 connectors/wechat/dist/
+!/connectors/**/config.yml
