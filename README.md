@@ -10,7 +10,10 @@ source code lives under `connectors/<name>` when it is open-sourced here.
 
 Documentation:
 
-<https://xagent.xiagaogao.com>
+- [xAgent Documentation](https://xagent.xiagaogao.com)
+- [Connector Guide](https://xagent.xiagaogao.com/docs/user-guide/connector/)
+- [Connector Installation](https://xagent.xiagaogao.com/docs/deployment/connector-install/)
+- [MCP vs. Connectors](https://xagent.xiagaogao.com/docs/guides/mcp-vs-connector/)
 
 ## What Is a Connector
 

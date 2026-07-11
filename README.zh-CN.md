@@ -8,7 +8,10 @@
 
 使用文档：
 
-<https://xagent.xiagaogao.com>
+- [xAgent 使用手册](https://xagent.xiagaogao.com)
+- [连接器](https://xagent.xiagaogao.com/docs/user-guide/connector/)
+- [Connector 安装](https://xagent.xiagaogao.com/docs/deployment/connector-install/)
+- [MCP 与连接器有什么区别](https://xagent.xiagaogao.com/docs/guides/mcp-vs-connector/)
 
 ## 什么是连接器
 
