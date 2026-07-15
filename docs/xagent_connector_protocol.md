@@ -881,6 +881,82 @@ payload 示例：
 - xAgent 默认把未指定目标的消息投递到用户主会话。
 - Connector 应在本地持久化 pending 队列和消费游标；channel 未打开时不要丢消息。
 
+#### 8.21.1 IM 建议消息格式（`xagent.im.v1`）
+
+IM Connector 建议使用统一字段表达入站消息。目标系统特有字段可以追加，但不应替代以下通用字段：
+
+| 字段 | 建议 | 说明 |
+| --- | --- | --- |
+| `provider` | 必填 | 目标 IM provider，例如 `wechat`、`feishu`、`telegram`。 |
+| `profile` | 必填 | 固定为 `xagent.im.v1`。 |
+| `event_kind` | 必填 | 接收普通消息时使用 `im.message.received`。 |
+| `message_id` | 必填 | 目标系统稳定消息 ID，用于去重和引用。 |
+| `sender_id` | 必填 | 目标系统发送方 ID。 |
+| `sender_name` / `display_name` | 建议 | 可读发送方名称；无法取得名称时可使用脱敏 ID。 |
+| `chat_id` | 建议 | 目标系统会话 ID。不得把它作为模型可自由填写的发送目标。 |
+| `chat_type` | 建议 | 目标系统原始会话类型，例如 `p2p`、`group`。 |
+| `message_type` | 必填 | 目标系统原始或归一化消息类型，例如 `text`、`image`、`file`。 |
+| `raw_text` | 必填 | 用户原始文本；无文本时使用空字符串。 |
+| `text` / `content` | 必填 | 面向用户和模型展示的完整 IM 消息说明，两者建议保持相同。 |
+| `activation_message` | 必填 | Agent 执行目标。普通 IM 消息建议与 `text` 相同，确保发送或回复工具及必要引用进入模型上下文。 |
+| `reply` | 建议 | 结构化回复提示，至少包含 `required` 和 `tool_id`；需要目标系统引用时同时携带不透明引用。 |
+| `skill` | 建议 | 复杂回复流程对应的 Skill ID 和所需工具 ID。 |
+| `media` | 有媒体时必填 | 媒体项数组，格式见下文。 |
+
+建议的可见文本模板：
+
+```text
+来自{来源名称}的用户消息：
+发送方：{发送方名称或 ID}
+会话类型：{单聊、群聊或目标系统原始类型}
+消息类型：{文本、图片、文件等}
+用户文本：{原始文本；没有文本时写“无”}
+
+先处理{来源名称}消息。文本回复使用 {text_tool_id} 工具；如果目标系统要求回复引用，必须使用本条消息携带的 {reply_ref_name}。如果需要回复媒体，先加载 {skill_id} skill，并使用 {media_tool_id} 工具。
+```
+
+完整 payload 示例：
+
+```json
+{
+  "provider": "feishu",
+  "profile": "xagent.im.v1",
+  "event_kind": "im.message.received",
+  "message_id": "om_xxx",
+  "sender_id": "ou_xxx",
+  "sender_name": "ou_xxx",
+  "chat_id": "oc_xxx",
+  "chat_type": "p2p",
+  "message_type": "text",
+  "raw_text": "睡觉了",
+  "text": "来自飞书的用户消息：\n发送方：ou_xxx\n会话类型：单聊\n消息类型：文本\n用户文本：睡觉了\n\n先处理飞书消息。文本回复使用 feishu_message_send 工具，参数 text 是回复内容。",
+  "content": "来自飞书的用户消息：\n发送方：ou_xxx\n会话类型：单聊\n消息类型：文本\n用户文本：睡觉了\n\n先处理飞书消息。文本回复使用 feishu_message_send 工具，参数 text 是回复内容。",
+  "activation_message": "来自飞书的用户消息：\n发送方：ou_xxx\n会话类型：单聊\n消息类型：文本\n用户文本：睡觉了\n\n先处理飞书消息。文本回复使用 feishu_message_send 工具，参数 text 是回复内容。",
+  "reply": {
+    "required": true,
+    "tool_id": "feishu_message_send"
+  },
+  "skill": {
+    "skill_id": "im-connector-reply",
+    "required_tool_ids": ["feishu_message_send", "feishu_message_send_image"]
+  }
+}
+```
+
+格式规则：
+
+- `raw_text` 保存用户原文；`text` 不应只放原文，应补足目标系统内部来源、消息类型和回复方式。
+- `activation_message` 不用于替代用户可见正文，但必须包含 Agent 完成发送或回复所需的信息。需要 provider 私有引用时，`reply_ref` 等必要引用必须进入执行目标。
+- `reply_ref`、`context_token` 等引用必须是不透明值，只能用于本条消息声明的回复工具，不能当作任意发送目标。
+- Connector 不应要求 Agent 根据 `chat_id`、`sender_id` 或消息正文推导回复目标。
+- `text` 中的工具 ID、Skill ID 和参数名必须与 Connector Card 当前声明完全一致。
+
+飞书的路由规则：
+
+- `p2p` 是默认智能体会话。Connector 持久化该单聊并使用 `feishu_message_send` / `feishu_message_send_image` 发送，不提供也不要求 `reply_ref`；主动通知同样走该默认单聊。
+- `group`、`topic_group` 等 @ 消息使用 `feishu_message_reply` / `feishu_message_reply_image`，并携带本条入站消息的不透明 `reply_ref`，确保回复原消息上下文。
+- 默认单聊尚未绑定时，主动发送必须明确失败；不得回退到最近群聊或让 Agent 自行填写 `chat_id`。
+
 媒体消息 payload 示例：
 
 ```json

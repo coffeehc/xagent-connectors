@@ -48,6 +48,7 @@ flowchart LR
 | --- | --- | --- | --- |
 | Telegram Connector | [`connectors/telegram`](connectors/telegram) | `v*` | 用于将 xAgent 接入 Telegram Bot API IM 场景。 |
 | WeChat Connector | [`connectors/wechat`](connectors/wechat) | `v*` | 用于将 xAgent 接入微信 IM 场景。 |
+| Feishu Connector | [`connectors/feishu`](connectors/feishu) | `v*` | 通过扫码创建应用接入国内飞书 IM。 |
 
 ## 下载
 
@@ -55,15 +56,16 @@ flowchart LR
 
 <https://github.com/coffeehc/xagent-connectors/releases>
 
-当前连接器发布同时包含 Telegram 和微信：
+当前连接器发布同时包含 Telegram、微信和飞书：
 
 ```text
-v0.0.2
+v0.0.4
 ```
 
 Release 附件通过连接器二进制名前缀区分，例如
-`xagent-telegram-connector-v0.0.2-linux-amd64.tar.gz` 和
-`xagent-wechat-connector-v0.0.2-linux-amd64.tar.gz`。
+`xagent-telegram-connector-v0.0.4-linux-amd64.tar.gz`、
+`xagent-wechat-connector-v0.0.4-linux-amd64.tar.gz` 和
+`xagent-feishu-connector-v0.0.4-linux-amd64.tar.gz`。
 
 ## 校验
 

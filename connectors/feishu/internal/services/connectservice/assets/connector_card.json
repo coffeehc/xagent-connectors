@@ -1,0 +1,85 @@
+{
+  "schema": "xagent.connector/v1",
+  "connector_card_id": "im.feishu",
+  "connector": {
+    "name": "Feishu Connector",
+    "version": "0.0.4",
+    "vendor": "xagent",
+    "description": "国内飞书 connector。用户扫码创建 xAgent助手应用，应用凭据和事件长连接全部由 connector 管理。"
+  },
+  "supports": {
+    "user_channel_mode": "single",
+    "target_types": ["im"],
+    "targets": [{"target_type": "im", "provider": "feishu", "label": "飞书", "description": "飞书单聊和群聊 @ 机器人消息。"}],
+    "profiles": ["xagent.im.v1"]
+  },
+  "tools": [
+    {
+      "tool_id": "feishu_message_send",
+      "profile": "xagent.im.v1",
+      "title": "发送飞书消息",
+      "description": "向 connector 已绑定的默认智能体单聊发送纯文本，不需要 reply_ref。",
+      "related_skill_ids": ["im-connector-reply"],
+      "input_schema": {
+        "type": "object",
+        "required": ["text"],
+        "additionalProperties": false,
+        "properties": {
+          "text": {"type": "string", "description": "要发送的纯文本。"}
+        }
+      }
+    },
+    {
+      "tool_id": "feishu_message_send_image",
+      "profile": "xagent.im.v1",
+      "title": "发送飞书图片",
+      "description": "向默认智能体单聊发送通过 POST /media/uploads 上传的图片，不需要 reply_ref。",
+      "related_skill_ids": ["im-connector-reply"],
+      "input_schema": {
+        "type": "object",
+        "required": ["media_ref"],
+        "additionalProperties": false,
+        "properties": {
+          "media_ref": {"type": "string", "description": "POST /media/uploads 返回的图片引用。"},
+          "text": {"type": "string", "description": "可选说明文字，将在图片后作为独立文本发送。"}
+        }
+      }
+    },
+    {
+      "tool_id": "feishu_message_reply",
+      "profile": "xagent.im.v1",
+      "title": "回复飞书消息",
+      "description": "使用入站消息携带的 reply_ref 回复纯文本。",
+      "related_skill_ids": ["im-connector-reply"],
+      "input_schema": {
+        "type": "object",
+        "required": ["reply_ref", "text"],
+        "additionalProperties": false,
+        "properties": {
+          "reply_ref": {"type": "string", "description": "飞书入站消息携带的不透明回复引用。"},
+          "text": {"type": "string", "description": "要回复的纯文本。"}
+        }
+      }
+    },
+    {
+      "tool_id": "feishu_message_reply_image",
+      "profile": "xagent.im.v1",
+      "title": "回复飞书图片",
+      "description": "使用 reply_ref 回复通过 POST /media/uploads 上传的图片。",
+      "related_skill_ids": ["im-connector-reply"],
+      "input_schema": {
+        "type": "object",
+        "required": ["reply_ref", "media_ref"],
+        "additionalProperties": false,
+        "properties": {
+          "reply_ref": {"type": "string", "description": "飞书入站消息携带的不透明回复引用。"},
+          "media_ref": {"type": "string", "description": "POST /media/uploads 返回的图片引用。"},
+          "text": {"type": "string", "description": "可选说明文字，将在图片后作为独立文本回复。"}
+        }
+      }
+    }
+  ],
+  "auth_flows": [{"id": "feishu_qr_create_app", "target_type": "im", "type": "qr_login", "title": "飞书扫码接入", "description": "扫码确认创建名称和描述已预设的 xAgent助手应用。"}],
+  "ui": {"login_flow": {"flow_id": "feishu_qr_create_app", "steps": [{"type": "qr_code", "request_type": "auth.start", "response_type": "auth.start.ack"}, {"type": "polling", "request_type": "auth.status", "response_type": "auth.status.ack"}]}},
+  "security": {"trust_level": "local", "api_key_required": true, "requires_signature": false, "data_classes": ["im.messages", "im.images", "app.credentials"]}
+}

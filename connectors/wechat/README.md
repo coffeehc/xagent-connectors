@@ -41,10 +41,10 @@ Run locally:
 The current connector release uses the repository-level tag:
 
 ```text
-v0.0.2
+v0.0.4
 ```
 
-The same release includes Telegram and WeChat assets. WeChat assets use the
+The same release includes Telegram, WeChat, and Feishu assets. WeChat assets use the
 `xagent-wechat-connector` prefix.
 
 ## Assets
@@ -52,10 +52,10 @@ The same release includes Telegram and WeChat assets. WeChat assets use the
 Typical release assets:
 
 ```text
-xagent-wechat-connector-v0.0.2-linux-amd64.tar.gz
-xagent-wechat-connector-v0.0.2-linux-arm64.tar.gz
-xagent-wechat-connector-v0.0.2-darwin-amd64.tar.gz
-xagent-wechat-connector-v0.0.2-darwin-arm64.tar.gz
+xagent-wechat-connector-v0.0.4-linux-amd64.tar.gz
+xagent-wechat-connector-v0.0.4-linux-arm64.tar.gz
+xagent-wechat-connector-v0.0.4-darwin-amd64.tar.gz
+xagent-wechat-connector-v0.0.4-darwin-arm64.tar.gz
 SHA256SUMS
 ```
 

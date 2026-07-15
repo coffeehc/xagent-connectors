@@ -37,10 +37,10 @@ go build -trimpath -o dist/xagent-wechat-connector .
 当前连接器发布使用仓库级 tag：
 
 ```text
-v0.0.2
+v0.0.4
 ```
 
-同一个 Release 同时包含 Telegram 和微信附件。WeChat 附件使用
+同一个 Release 同时包含 Telegram、微信和飞书附件。WeChat 附件使用
 `xagent-wechat-connector` 前缀区分。
 
 ## 发布附件
@@ -48,10 +48,10 @@ v0.0.2
 常见附件示例：
 
 ```text
-xagent-wechat-connector-v0.0.2-linux-amd64.tar.gz
-xagent-wechat-connector-v0.0.2-linux-arm64.tar.gz
-xagent-wechat-connector-v0.0.2-darwin-amd64.tar.gz
-xagent-wechat-connector-v0.0.2-darwin-arm64.tar.gz
+xagent-wechat-connector-v0.0.4-linux-amd64.tar.gz
+xagent-wechat-connector-v0.0.4-linux-arm64.tar.gz
+xagent-wechat-connector-v0.0.4-darwin-amd64.tar.gz
+xagent-wechat-connector-v0.0.4-darwin-arm64.tar.gz
 SHA256SUMS
 ```
 

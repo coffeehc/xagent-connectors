@@ -63,6 +63,9 @@ state ownership, lifecycle, and safety boundaries.
 - [`connectors/telegram`](connectors/telegram): Telegram Connector source. It
   is a separate Go module and uses user-provided Telegram bot tokens plus chat
   IDs for IM channel binding.
+- [`connectors/feishu`](connectors/feishu): domestic Feishu Connector source.
+  It creates a preconfigured application through QR authorization and keeps
+  application credentials inside the connector.
 
 ## Connectors
 
@@ -70,6 +73,7 @@ state ownership, lifecycle, and safety boundaries.
 | --- | --- | --- | --- |
 | Telegram Connector | [`connectors/telegram`](connectors/telegram) | `v*` | Connects xAgent with Telegram Bot API IM scenarios. |
 | WeChat Connector | [`connectors/wechat`](connectors/wechat) | `v*` | Connects xAgent with WeChat IM scenarios. |
+| Feishu Connector | [`connectors/feishu`](connectors/feishu) | `v*` | Connects xAgent with domestic Feishu IM through QR-created applications. |
 
 ## Download
 
@@ -77,15 +81,16 @@ Download connector binaries from:
 
 <https://github.com/coffeehc/xagent-connectors/releases>
 
-The current connector release includes both Telegram and WeChat:
+The current connector release includes Telegram, WeChat, and Feishu:
 
 ```text
-v0.0.3
+v0.0.4
 ```
 
 Release assets use connector-specific binary prefixes, for example
-`xagent-telegram-connector-v0.0.3-linux-amd64.tar.gz` and
-`xagent-wechat-connector-v0.0.3-linux-amd64.tar.gz`.
+`xagent-telegram-connector-v0.0.4-linux-amd64.tar.gz`,
+`xagent-wechat-connector-v0.0.4-linux-amd64.tar.gz`, and
+`xagent-feishu-connector-v0.0.4-linux-amd64.tar.gz`.
 
 ## Verify Artifacts
 

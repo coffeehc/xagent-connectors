@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release tag, for example v0.0.3"
+        description: "Release tag, for example v0.0.4"
         required: true
-        default: "v0.0.3"
+        default: "v0.0.4"
       replace_existing:
         description: "Delete an existing release and tag before publishing"
         required: true
@@ -36,6 +36,7 @@ jobs:
           go-version-file: go.work
           cache-dependency-path: |
             go.work.sum
+            connectors/feishu/go.sum
             connectors/wechat/go.sum
             connectors/telegram/go.sum
 
@@ -73,7 +74,7 @@ jobs:
           tag="${{ steps.release.outputs.tag }}"
           version="${{ steps.release.outputs.version }}"
 
-          for connector_dir in connectors/wechat connectors/telegram; do
+          for connector_dir in connectors/wechat connectors/telegram connectors/feishu; do
             jq empty "$connector_dir/releases.json"
             jq empty "$connector_dir/internal/services/connectservice/assets/connector_card.json"
 
@@ -94,8 +95,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          go test ./connectors/protocol ./connectors/wechat/... ./connectors/telegram/...
-          go vet ./connectors/protocol ./connectors/wechat/... ./connectors/telegram/...
+          go test ./connectors/protocol ./connectors/feishu/... ./connectors/wechat/... ./connectors/telegram/...
+          go vet ./connectors/protocol ./connectors/feishu/... ./connectors/wechat/... ./connectors/telegram/...
 
       - name: Prepare replacement release
         if: github.event_name == 'workflow_dispatch'
@@ -152,6 +153,7 @@ jobs:
 
           build_connector connectors/wechat xagent-wechat-connector
           build_connector connectors/telegram xagent-telegram-connector
+          build_connector connectors/feishu xagent-feishu-connector
 
           (
             cd "$release_dir"
@@ -175,8 +177,9 @@ jobs:
           Included connectors:
           - WeChat Connector
           - Telegram Connector
+          - Feishu Connector
 
-          Assets follow connectors/wechat/releases.json and connectors/telegram/releases.json.
+          Assets follow the releases.json files under each connector directory.
           EOF
 
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
