@@ -95,6 +95,7 @@ Base URL 规则：
     "description": "Bridge WeChat messages into xAgent."
   },
   "supports": {
+    "user_channel_mode": "single",
     "target_types": ["im"],
     "targets": [
       {
@@ -196,6 +197,7 @@ Base URL 规则：
 - `connector.version` 必填。
 - `supports.target_types` 必须非空；当前支持 `im`、`email`、`calendar`、`ticket`。
 - `supports.profiles` 必须非空。
+- `supports.user_channel_mode` 可取 `single` 或 `multiple`；字段缺失时 xAgent 按 `single` 兼容处理。
 - `tools[].tool_id` 必须非空且不能重复。
 - `tools[].tool_id` 会直接作为模型函数名暴露，长度不能超过 256，只能包含 ASCII 字母、数字、下划线、连字符和点号。
 - `tools[].related_skill_ids` 可声明使用或选择该工具时建议加载的 Connector Skill；它是工作流提示，不代表工具调用前必须额外认证。
@@ -206,6 +208,7 @@ Base URL 规则：
 建议：
 
 - `supports.targets[]` 应声明 `target_type`、`provider`、`label`，否则 xAgent 只能回退到 Connector 名称作为来源。
+- `supports.user_channel_mode` 只供 xAgent 在 `channel.open` 前限制单个用户可创建的 channel 数量；Connector Server 不据此拒绝或合并信令。
 - `auth_flows[].target_type` 应与 `supports.target_types` 对齐。
 - `auth_flows[].type` 当前建议使用 `qr_login` 或 `form`。
 - `auth_flows[].fields` 仅用于 `type = form`，至少包含一个字段。

@@ -3,11 +3,12 @@
   "connector_card_id": "im.wechat",
   "connector": {
     "name": "WeChat Connector",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "vendor": "xagent",
     "description": "Local WeChat connector backed by WeChat iLink QR login. The QR payload comes from WeChat, and the bot token stays inside this connector."
   },
   "supports": {
+    "user_channel_mode": "single",
     "target_types": ["im"],
     "targets": [
       {

@@ -3,11 +3,12 @@
   "connector_card_id": "im.telegram",
   "connector": {
     "name": "Telegram Connector",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "vendor": "xagent",
     "description": "Local Telegram connector backed by Telegram Bot API. Users bind their own bot_token and target chat_id; the connector keeps tokens inside local storage."
   },
   "supports": {
+    "user_channel_mode": "single",
     "target_types": ["im"],
     "targets": [
       {

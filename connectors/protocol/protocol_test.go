@@ -20,6 +20,21 @@ func TestProtocolConstants(t *testing.T) {
 	}
 }
 
+func TestConnectorCardUserChannelModeJSON(t *testing.T) {
+	var card ConnectorCard
+	if err := json.Unmarshal([]byte(`{
+		"schema":"xagent.connector/v1",
+		"connector_card_id":"im.wechat",
+		"connector":{"name":"WeChat Connector","version":"0.0.2"},
+		"supports":{"user_channel_mode":"single","target_types":["im"],"profiles":["xagent.im.v1"]}
+	}`), &card); err != nil {
+		t.Fatalf("decode ConnectorCard failed: %v", err)
+	}
+	if card.Supports.UserChannelMode != ConnectorUserChannelModeSingle {
+		t.Fatalf("unexpected user_channel_mode: %s", card.Supports.UserChannelMode)
+	}
+}
+
 func TestConnectorAuthStartRequestJSON(t *testing.T) {
 	var request ConnectorAuthStartRequest
 	if err := json.Unmarshal([]byte(`{"flow_id":"telegram_bot_binding","input":{"bot_token":"secret","chat_id":"123"}}`), &request); err != nil {

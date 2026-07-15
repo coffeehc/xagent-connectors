@@ -47,6 +47,19 @@ const (
 	ConnectorTargetTypeTicket ConnectorTargetType = "ticket"
 )
 
+// ConnectorUserChannelMode 表示 xAgent 对单个用户创建 Connector channel 的治理模式。
+//
+// 该枚举只供 xAgent 在 channel.open 前实施用户级数量限制，Connector Server 不得据此
+// 拒绝或合并 channel.open 信令。空值由 xAgent 按 single 处理，以兼容尚未声明该字段的旧 Card。
+type ConnectorUserChannelMode string
+
+const (
+	// ConnectorUserChannelModeSingle 表示 xAgent 对每个用户只允许保留一个当前 Connector Card channel。
+	ConnectorUserChannelModeSingle ConnectorUserChannelMode = "single"
+	// ConnectorUserChannelModeMultiple 表示 xAgent 允许每个用户创建多个当前 Connector Card channel。
+	ConnectorUserChannelModeMultiple ConnectorUserChannelMode = "multiple"
+)
+
 // ConnectorCard 表示 Connector Server 暴露给 xAgent 的未绑定前自描述卡片。
 //
 // 约束说明：
@@ -90,8 +103,11 @@ type ConnectorCardInfo struct {
 	Description string `json:"description,omitempty"`
 }
 
-// ConnectorCardSupports 表示 connector 支持的目标类型和 profile。
+// ConnectorCardSupports 表示 connector 支持的目标类型、profile 和 xAgent 用户 channel 治理声明。
 type ConnectorCardSupports struct {
+	// UserChannelMode 表示 xAgent 对单个用户创建当前 Card channel 的治理模式；为空时由 xAgent 按 single 处理。
+	// Connector Server 只声明该策略，不负责执行 channel 数量限制。
+	UserChannelMode ConnectorUserChannelMode `json:"user_channel_mode,omitempty"`
 	// TargetTypes 表示 connector 支持的 target type 集合。
 	TargetTypes []ConnectorTargetType `json:"target_types,omitempty"`
 	// Targets 表示 connector 支持的具体目标系统集合，保留 provider 与 label 的自由扩展空间。

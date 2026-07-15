@@ -175,6 +175,9 @@ func TestBuildConnectorCardDeclaresFormAuth(t *testing.T) {
 	if card.ConnectorCardID != protocol.ConnectorCardID {
 		t.Fatalf("unexpected connector_card_id: %s", card.ConnectorCardID)
 	}
+	if card.Supports.UserChannelMode != connectorprotocol.ConnectorUserChannelModeSingle {
+		t.Fatalf("Telegram Connector Card must declare single user channel mode, got=%s", card.Supports.UserChannelMode)
+	}
 	if len(card.Tools) != 2 {
 		t.Fatalf("unexpected tool count: %d", len(card.Tools))
 	}

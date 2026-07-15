@@ -157,6 +157,36 @@ func TestBuildChannelDescriptorInjectsAcceptedConnectorID(t *testing.T) {
 	}
 }
 
+func TestConnectorHelloReassignsConnectorIDWhenCachedIDDiffers(t *testing.T) {
+	impl := newService(&testConnectService{}).(*serviceImpl)
+	impl.connectorID = "conn_im_wechat_current"
+	conn := openTestDataPlane(t, impl)
+	defer conn.Close()
+
+	mustWriteWirePacket(t, conn, &connectorprotocol.WirePacket{
+		Schema:    connectorprotocol.PacketSchema,
+		PacketID:  "pkt_hello",
+		RequestID: "req_hello",
+		Type:      "connector.hello",
+		Time:      time.Now().UnixMilli(),
+		Payload: map[string]any{
+			"connector_card_id": protocol.ConnectorCardID,
+			"connector_id":      "conn_im_wechat_cached",
+		},
+	})
+	helloAck := mustReadWirePacket(t, conn)
+	if helloAck.Type != "connector.hello.ack" {
+		t.Fatalf("connector_id 不一致时应重新分配并接受 hello，got=%s", helloAck.Type)
+	}
+	assignedConnectorID := stringFromAny(helloAck.Payload["connector_id"])
+	if assignedConnectorID == "" || assignedConnectorID == "conn_im_wechat_current" || assignedConnectorID == "conn_im_wechat_cached" {
+		t.Fatalf("connector_id 不一致时必须分配新 ID，got=%q", assignedConnectorID)
+	}
+	if impl.connectorID != assignedConnectorID {
+		t.Fatalf("运行态 connector_id 应与 hello.ack 一致，runtime=%q ack=%q", impl.connectorID, assignedConnectorID)
+	}
+}
+
 func TestPushMessageWritesMessagePushPacket(t *testing.T) {
 	impl := newService(&testConnectService{
 		descriptor: &connectorprotocol.ConnectionDescriptor{

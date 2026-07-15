@@ -504,6 +504,9 @@ func TestBuildConnectorCardDeclaresStaticCapabilities(t *testing.T) {
 	if card.Schema != "xagent.connector/v1" || card.ConnectorCardID != "im.wechat" {
 		t.Fatalf("Connector Card 基础身份异常: %+v", card)
 	}
+	if card.Supports.UserChannelMode != connectorprotocol.ConnectorUserChannelModeSingle {
+		t.Fatalf("微信 Connector Card 必须声明单用户单 channel，got=%s", card.Supports.UserChannelMode)
+	}
 	if len(card.Tools) != 2 {
 		t.Fatalf("Connector Card 应声明 2 个工具，got=%d tools=%+v", len(card.Tools), card.Tools)
 	}

@@ -80,12 +80,12 @@ Download connector binaries from:
 The current connector release includes both Telegram and WeChat:
 
 ```text
-v0.0.2
+v0.0.3
 ```
 
 Release assets use connector-specific binary prefixes, for example
-`xagent-telegram-connector-v0.0.2-linux-amd64.tar.gz` and
-`xagent-wechat-connector-v0.0.2-linux-amd64.tar.gz`.
+`xagent-telegram-connector-v0.0.3-linux-amd64.tar.gz` and
+`xagent-wechat-connector-v0.0.3-linux-amd64.tar.gz`.
 
 ## Verify Artifacts
 

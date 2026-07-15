@@ -2,7 +2,7 @@
   "connector": "telegram",
   "name": "xAgent Telegram Connector",
   "release_tag_pattern": "v*",
-  "latest": "v0.0.2",
+  "latest": "v0.0.3",
   "releases_url": "https://github.com/coffeehc/xagent-connectors/releases",
   "asset_name_pattern": "xagent-telegram-connector-{version}-{os}-{arch}.tar.gz",
   "supported_targets": [

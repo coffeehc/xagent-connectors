@@ -201,11 +201,15 @@ func (impl *serviceImpl) handleConnectorHello(conn *channelConnection, packet *c
 		} else {
 			impl.connectorID = "conn_" + sanitizeIDPart(connectorCardID) + "_" + randomToken(8)
 		}
-	}
-	if connectorID != "" && connectorID != impl.connectorID {
-		impl.mu.Unlock()
-		_ = writeError(conn, packet.RequestID, "", "connector_id_mismatch", "connector_id does not match this connector")
-		return false
+	} else if connectorID != "" && connectorID != impl.connectorID {
+		previousConnectorID := impl.connectorID
+		impl.connectorID = "conn_" + sanitizeIDPart(connectorCardID) + "_" + randomToken(8)
+		log.Debug("connector hello 检测到后端身份变化，已重新分配 connector_id",
+			zap.String("connector_card_id", connectorCardID),
+			zap.String("cached_connector_id", connectorID),
+			zap.String("previous_connector_id", previousConnectorID),
+			zap.String("assigned_connector_id", impl.connectorID),
+		)
 	}
 	connectorID = impl.connectorID
 	impl.mu.Unlock()
